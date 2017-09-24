@@ -49,5 +49,7 @@ log:
 datadog:
   api-key: xxx
   app-key: xxx
+
+dry-run: false
 ```
 

@@ -31,12 +31,11 @@ type PodController struct {
 	queue     workqueue.RateLimitingInterface
 	informer  cache.SharedIndexInformer
 	handler   handlers.Handler
-	notifiers []notifiers.Notifier
 }
 
-func Start(conf *config.AlertConfig, handler handlers.Handler, notifiers []notifiers.Notifier) {
+func Start(conf *config.AlertConfig, handler handlers.Handler) {
 	handler.Init(conf)
-	c := newPodController(conf, handler, notifiers)
+	c := newPodController(conf, handler)
 	stopCh := make(chan struct{})
 	defer close(stopCh)
 
@@ -49,7 +48,7 @@ func Start(conf *config.AlertConfig, handler handlers.Handler, notifiers []notif
 
 }
 
-func newPodController(conf *config.AlertConfig, handler handlers.Handler, notifiers []notifiers.Notifier) *PodController {
+func newPodController(conf *config.AlertConfig, handler handlers.Handler) *PodController {
 	client := conf.ClientSet
 	queue := workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
 
@@ -93,7 +92,6 @@ func newPodController(conf *config.AlertConfig, handler handlers.Handler, notifi
 		informer:  informer,
 		queue:     queue,
 		handler:   handler,
-		notifiers: notifiers,
 	}
 }
 
@@ -159,12 +157,7 @@ func (c *PodController) processItem(key string) error {
 
 	status, msg := c.handler.ObjectCreated(obj)
 	if !status {
-		for _, notifier := range c.notifiers {
-			err := notifier.Notify(c.conf, "Pod failure", msg)
-			if err != nil {
-				c.conf.Logger.Warningf("Failed to handle a pod: %s", err)
-			}
-		}
+		notifiers.Notify(c.conf, "Pod failure", msg)
 	}
 
 	return nil

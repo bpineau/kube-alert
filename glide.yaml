@@ -1,0 +1,29 @@
+package: github.com/bpineau/kube-alert
+ignore:
+- k8s.io/apimachinery/pkg/apis/meta/v1alpha1
+import:
+- package: k8s.io/client-go
+  version: v4.0.0
+  subpackages:
+  - kubernetes
+  - pkg/api/v1
+  - plugin/pkg/client/auth/gcp
+  - rest
+  - tools/clientcmd
+- package: github.com/spf13/cobra
+  version: b78744579491c1ceeaaa3b40205e56b0591b93a3
+- package: github.com/spf13/viper
+  version: ~1.0.0
+- package: github.com/spf13/pflag
+  version: ~1.0.0
+- package: github.com/mitchellh/go-homedir
+  version: b8bc1bf767474819792c23f32d8286a45736f1c6
+- package: github.com/sirupsen/logrus
+  version: ~1.0.3
+- package: github.com/zorkian/go-datadog-api
+  version: v2.5
+# See https://github.com/sirupsen/logrus/issues/553
+- package: github.com/Sirupsen/logrus
+  repo: git@github.com:/sirupsen/logrus
+  vcs: git
+  version: ~1.0.3

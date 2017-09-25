@@ -33,6 +33,7 @@ Flags:
   -i, --datadog-api-key string   datadog api key
   -a, --datadog-app-key string   datadog app key
   -d, --dry-run                  dry-run mode
+  -p, --healthcheck-port int     port for answering healtchecks
   -h, --help                     help for kube-alert
   -k, --kube-config string       kube config path
   -v, --log-level string         log level (default "debug")
@@ -42,6 +43,8 @@ Flags:
 
 Using an (optional) configuration file:
 ```yaml
+dry-run: false
+healthcheck-port: 8080
 log:
   output: "stdout"
   level: "debug"
@@ -49,7 +52,5 @@ log:
 datadog:
   api-key: xxx
   app-key: xxx
-
-dry-run: false
 ```
 

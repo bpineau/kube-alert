@@ -27,10 +27,10 @@ var (
 )
 
 type PodController struct {
-	conf      *config.AlertConfig
-	queue     workqueue.RateLimitingInterface
-	informer  cache.SharedIndexInformer
-	handler   handlers.Handler
+	conf     *config.AlertConfig
+	queue    workqueue.RateLimitingInterface
+	informer cache.SharedIndexInformer
+	handler  handlers.Handler
 }
 
 func Start(conf *config.AlertConfig, handler handlers.Handler) {
@@ -88,10 +88,10 @@ func newPodController(conf *config.AlertConfig, handler handlers.Handler) *PodCo
 	})
 
 	return &PodController{
-		conf:      conf,
-		informer:  informer,
-		queue:     queue,
-		handler:   handler,
+		conf:     conf,
+		informer: informer,
+		queue:    queue,
+		handler:  handler,
 	}
 }
 

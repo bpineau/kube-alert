@@ -9,11 +9,12 @@ import (
 )
 
 type AlertConfig struct {
-	DryRun    bool
-	Logger    *logrus.Logger
-	ClientSet *kubernetes.Clientset
-	DdAppKey  string
-	DdApiKey  string
+	DryRun     bool
+	Logger     *logrus.Logger
+	ClientSet  *kubernetes.Clientset
+	DdAppKey   string
+	DdApiKey   string
+	HealthPort int
 }
 
 func (c *AlertConfig) Init(apiserver string, kubeconfig string) {

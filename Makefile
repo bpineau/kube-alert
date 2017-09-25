@@ -7,6 +7,9 @@ fmt:
 deps:
 	glide install
 
+build:
+	env CGO_ENABLED=0 go build
+
 install:
 	env CGO_ENABLED=0 go install
 

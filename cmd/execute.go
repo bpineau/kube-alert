@@ -25,6 +25,7 @@ var (
 	logServer string
 	ddApiKey  string
 	ddAppKey  string
+	healthP   int
 
 	// rootCmd represents the base command when called without any subcommands
 	rootCmd = &cobra.Command{
@@ -34,10 +35,11 @@ var (
 
 		Run: func(cmd *cobra.Command, args []string) {
 			config := &config.AlertConfig{
-				DryRun:   viper.GetBool("dry-run"),
-				Logger:   log.New(viper.GetString("log.level"), viper.GetString("log.server"), viper.GetString("log.output")),
-				DdAppKey: viper.GetString("datadog.app-key"),
-				DdApiKey: viper.GetString("datadog.api-key"),
+				DryRun:     viper.GetBool("dry-run"),
+				Logger:     log.New(viper.GetString("log.level"), viper.GetString("log.server"), viper.GetString("log.output")),
+				DdAppKey:   viper.GetString("datadog.app-key"),
+				DdApiKey:   viper.GetString("datadog.api-key"),
+				HealthPort: viper.GetInt("healthcheck-port"),
 			}
 			config.Init(viper.GetString("api-server"), viper.GetString("kube-config"))
 			run.Run(config)
@@ -82,6 +84,9 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVarP(&ddApiKey, "datadog-api-key", "i", "", "datadog api key")
 	viper.BindPFlag("datadog.api-key", rootCmd.PersistentFlags().Lookup("datadog-api-key"))
+
+	rootCmd.PersistentFlags().IntVarP(&healthP, "healthcheck-port", "p", 0, "port for answering healtchecks")
+	viper.BindPFlag("healthcheck-port", rootCmd.PersistentFlags().Lookup("healthcheck-port"))
 }
 
 func initConfig() {

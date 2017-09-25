@@ -5,6 +5,7 @@ fmt:
 	go fmt ./...
 
 deps:
+	which glide || go get -u github.com/Masterminds/glide
 	glide install
 
 build:
@@ -18,10 +19,5 @@ clean:
 
 test:
 	go test -v ./...
-
-HAS_GLIDE := $(shell command -v glide;)
-ifndef HAS_GLIDE
-	go get -u github.com/Masterminds/glide
-endif
 
 .PHONY: fmt install clean test all

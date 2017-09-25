@@ -25,6 +25,9 @@ func (h *PodHandler) ObjectCreated(obj interface{}) (bool, string) {
 	pod, _ := obj.(*v1.Pod)
 
 	// ignore recent pods
+	if pod.Status.StartTime == nil {
+		return true, ""
+	}
 	if time.Now().Add(-minAgeMinutes * time.Minute).Before(pod.Status.StartTime.Time) {
 		return true, ""
 	}

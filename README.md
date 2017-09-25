@@ -1,6 +1,7 @@
 # kube-alert
 
 kube-alert watch for pod failures or anomalies, and send alerts accordingly.
+
 Currently support alerting to Datadog and logs (ie. syslog).
 
 ## Build
@@ -14,10 +15,9 @@ make build
 
 ## Usage
 
-The daemon may run as a pod in the cluster (then should find the Kubernetes
-api-server automatically), or outside of the cluster (then, he will use the
-"-s" command line flag, or the Kubernetes configuration specified with "-k",
-or the default ~/.kube/config).
+The daemon may run as a pod in the cluster, or outside of the cluster.
+He should find the Kubernetes api-server automatically, but you can
+provide this server's address with "-s" flag, or a full config with "-k".
 
 You can pass configuration values either by command line arguments, or
 environment variables, or with a yaml configuration file.
@@ -45,6 +45,8 @@ Using an (optional) configuration file:
 ```yaml
 dry-run: false
 healthcheck-port: 8080
+api-server: http://example.com:8080
+
 log:
   output: "stdout"
   level: "debug"

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"os"
+	"strings"
 
 	"github.com/mitchellh/go-homedir"
 	"github.com/sirupsen/logrus"
@@ -85,7 +86,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&ddApiKey, "datadog-api-key", "i", "", "datadog api key")
 	viper.BindPFlag("datadog.api-key", rootCmd.PersistentFlags().Lookup("datadog-api-key"))
 
-	rootCmd.PersistentFlags().IntVarP(&healthP, "healthcheck-port", "p", 0, "port for answering healtchecks")
+	rootCmd.PersistentFlags().IntVarP(&healthP, "healthcheck-port", "p", 0, "port for answering healthchecks")
 	viper.BindPFlag("healthcheck-port", rootCmd.PersistentFlags().Lookup("healthcheck-port"))
 }
 
@@ -107,6 +108,8 @@ func initConfig() {
 
 	// allow config params through prefixed env variables
 	viper.SetEnvPrefix("KUBE_ALERT")
+	replacer := strings.NewReplacer("-", "_")
+	viper.SetEnvKeyReplacer(replacer)
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err == nil {

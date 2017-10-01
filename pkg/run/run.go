@@ -7,13 +7,18 @@ import (
 
 	"github.com/bpineau/kube-alert/config"
 	"github.com/bpineau/kube-alert/pkg/controllers"
+	"github.com/bpineau/kube-alert/pkg/controllers/pod"
 	"github.com/bpineau/kube-alert/pkg/handlers"
 	"github.com/bpineau/kube-alert/pkg/health"
 )
 
+var Controllers = []controllers.Controller{
+	&pod.PodController{},
+}
+
 func Run(config *config.AlertConfig) {
-	for _, controller := range controllers.Controllers {
-		go controller.Start(config, handlers.Handlers[controller.HandlerName()])
+	for _, c := range Controllers {
+		go c.Init(config, handlers.Handlers[c.HandlerName()]).Start()
 	}
 
 	go health.HealthCheckServe(config)

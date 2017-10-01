@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+
 	"github.com/bpineau/kube-alert/pkg/clientset"
 	"github.com/sirupsen/logrus"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

@@ -4,9 +4,10 @@ import (
 	"io"
 	"os"
 
+	"log/syslog"
+
 	"github.com/sirupsen/logrus"
 	ls "github.com/sirupsen/logrus/hooks/syslog"
-	"log/syslog"
 )
 
 func New(logLevel string, logServer string, logOutput string) *logrus.Logger {

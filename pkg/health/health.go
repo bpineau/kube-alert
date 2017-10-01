@@ -9,7 +9,9 @@ import (
 )
 
 func healthCheckReply(w http.ResponseWriter, r *http.Request) {
-	io.WriteString(w, "ok\n")
+	if _, err := io.WriteString(w, "ok\n"); err != nil {
+		fmt.Printf("Failed to reply to http healtcheck: %s\n", err)
+	}
 }
 
 func HealthCheckServe(c *config.AlertConfig) {
@@ -17,5 +19,7 @@ func HealthCheckServe(c *config.AlertConfig) {
 		return
 	}
 	http.HandleFunc("/health", healthCheckReply)
-	http.ListenAndServe(fmt.Sprintf(":%d", c.HealthPort), nil)
+	if err := http.ListenAndServe(fmt.Sprintf(":%d", c.HealthPort), nil); err != nil {
+		panic(fmt.Sprintf("Failed to start http healtcheck: %s", err))
+	}
 }

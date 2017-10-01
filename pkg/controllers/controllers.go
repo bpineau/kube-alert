@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"syscall"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/bpineau/kube-alert/config"
@@ -31,17 +31,19 @@ type Controller interface {
 }
 
 type CommonController struct {
-	Conf       *config.AlertConfig
-	Queue      workqueue.RateLimitingInterface
-	Informer   cache.SharedIndexInformer
-	Handler    handlers.Handler
-	Name       string
-	ListWatch  cache.ListerWatcher
-	ObjType    runtime.Object
+	Conf      *config.AlertConfig
+	Queue     workqueue.RateLimitingInterface
+	Informer  cache.SharedIndexInformer
+	Handler   handlers.Handler
+	Name      string
+	ListWatch cache.ListerWatcher
+	ObjType   runtime.Object
 }
 
 func (c *CommonController) Start() {
-	c.Handler.Init(c.Conf)
+	if err := c.Handler.Init(c.Conf); err != nil {
+		c.Conf.Logger.Fatalf("Failed to init %s handler: %s", c.Name, err)
+	}
 
 	c.startInformer()
 	stopCh := make(chan struct{})

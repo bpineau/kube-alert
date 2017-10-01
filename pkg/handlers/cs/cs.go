@@ -25,7 +25,7 @@ func (h *CsHandler) ObjectCreated(obj interface{}) (bool, string) {
 			continue
 		}
 		if c.Status != "True" {
-			return false, fmt.Sprintf("%s/%s is unhealthy: %s", cs.Name, c.Message)
+			return false, fmt.Sprintf("%s is unhealthy: %s", cs.Name, c.Message)
 		}
 	}
 

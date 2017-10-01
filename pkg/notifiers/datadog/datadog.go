@@ -15,7 +15,7 @@ var tags = []string{
 
 func (l *DdNotifier) Notify(c *config.AlertConfig, title string, msg string) error {
 	if c.DdApiKey == "" {
-		c.Logger.Debug("Omiting datadog notification, api key missing")
+		c.Logger.Debug("Omitting datadog notification, api key missing")
 		return nil
 	}
 

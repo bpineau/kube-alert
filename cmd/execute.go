@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"log"
 	"os"
 	"strings"
 
@@ -10,11 +11,11 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/bpineau/kube-alert/config"
-	"github.com/bpineau/kube-alert/pkg/log"
+	klog "github.com/bpineau/kube-alert/pkg/log"
 	"github.com/bpineau/kube-alert/pkg/run"
 )
 
-const AppName = "kube-alert"
+const appName = "kube-alert"
 
 var (
 	cfgFile   string
@@ -30,14 +31,14 @@ var (
 
 	// rootCmd represents the base command when called without any subcommands
 	rootCmd = &cobra.Command{
-		Use:   AppName,
+		Use:   appName,
 		Short: "Monitor pods",
 		Long:  "Monitor pods and alert on failure",
 
 		Run: func(cmd *cobra.Command, args []string) {
 			config := &config.AlertConfig{
 				DryRun:     viper.GetBool("dry-run"),
-				Logger:     log.New(viper.GetString("log.level"), viper.GetString("log.server"), viper.GetString("log.output")),
+				Logger:     klog.New(viper.GetString("log.level"), viper.GetString("log.server"), viper.GetString("log.output")),
 				DdAppKey:   viper.GetString("datadog.app-key"),
 				DdApiKey:   viper.GetString("datadog.api-key"),
 				HealthPort: viper.GetInt("healthcheck-port"),
@@ -58,44 +59,64 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	defaultCfg := "/etc/" + AppName + "/" + AppName + ".yaml"
+	defaultCfg := "/etc/" + appName + "/" + appName + ".yaml"
 	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", defaultCfg, "configuration file")
 
 	rootCmd.PersistentFlags().StringVarP(&apiServer, "api-server", "s", "", "kube api server url")
-	viper.BindPFlag("api-server", rootCmd.PersistentFlags().Lookup("api-server"))
+	if err := viper.BindPFlag("api-server", rootCmd.PersistentFlags().Lookup("api-server")); err != nil {
+		log.Fatal("Failed to bind cli argument:", err)
+	}
 
 	rootCmd.PersistentFlags().StringVarP(&kubeConf, "kube-config", "k", "", "kube config path")
-	viper.BindPFlag("kube-config", rootCmd.PersistentFlags().Lookup("kube-config"))
-	viper.BindEnv("kube-config", "KUBECONFIG")
+	if err := viper.BindPFlag("kube-config", rootCmd.PersistentFlags().Lookup("kube-config")); err != nil {
+		log.Fatal("Failed to bind cli argument:", err)
+	}
+	if err := viper.BindEnv("kube-config", "KUBECONFIG"); err != nil {
+		log.Fatal("Failed to bind cli argument:", err)
+	}
 
 	rootCmd.PersistentFlags().BoolVarP(&dryRun, "dry-run", "d", false, "dry-run mode")
-	viper.BindPFlag("dry-run", rootCmd.PersistentFlags().Lookup("dry-run"))
+	if err := viper.BindPFlag("dry-run", rootCmd.PersistentFlags().Lookup("dry-run")); err != nil {
+		log.Fatal("Failed to bind cli argument:", err)
+	}
 
 	rootCmd.PersistentFlags().StringVarP(&logLevel, "log-level", "v", "debug", "log level")
-	viper.BindPFlag("log.level", rootCmd.PersistentFlags().Lookup("log-level"))
+	if err := viper.BindPFlag("log.level", rootCmd.PersistentFlags().Lookup("log-level")); err != nil {
+		log.Fatal("Failed to bind cli argument:", err)
+	}
 
 	rootCmd.PersistentFlags().StringVarP(&logOutput, "log-output", "l", "stderr", "log output")
-	viper.BindPFlag("log.output", rootCmd.PersistentFlags().Lookup("log-output"))
+	if err := viper.BindPFlag("log.output", rootCmd.PersistentFlags().Lookup("log-output")); err != nil {
+		log.Fatal("Failed to bind cli argument:", err)
+	}
 
 	rootCmd.PersistentFlags().StringVarP(&logServer, "log-server", "r", "", "log server (if using syslog)")
-	viper.BindPFlag("log.server", rootCmd.PersistentFlags().Lookup("log-server"))
+	if err := viper.BindPFlag("log.server", rootCmd.PersistentFlags().Lookup("log-server")); err != nil {
+		log.Fatal("Failed to bind cli argument:", err)
+	}
 
 	rootCmd.PersistentFlags().StringVarP(&ddAppKey, "datadog-app-key", "a", "", "datadog app key")
-	viper.BindPFlag("datadog.app-key", rootCmd.PersistentFlags().Lookup("datadog-app-key"))
+	if err := viper.BindPFlag("datadog.app-key", rootCmd.PersistentFlags().Lookup("datadog-app-key")); err != nil {
+		log.Fatal("Failed to bind cli argument:", err)
+	}
 
 	rootCmd.PersistentFlags().StringVarP(&ddApiKey, "datadog-api-key", "i", "", "datadog api key")
-	viper.BindPFlag("datadog.api-key", rootCmd.PersistentFlags().Lookup("datadog-api-key"))
+	if err := viper.BindPFlag("datadog.api-key", rootCmd.PersistentFlags().Lookup("datadog-api-key")); err != nil {
+		log.Fatal("Failed to bind cli argument:", err)
+	}
 
 	rootCmd.PersistentFlags().IntVarP(&healthP, "healthcheck-port", "p", 0, "port for answering healthchecks")
-	viper.BindPFlag("healthcheck-port", rootCmd.PersistentFlags().Lookup("healthcheck-port"))
+	if err := viper.BindPFlag("healthcheck-port", rootCmd.PersistentFlags().Lookup("healthcheck-port")); err != nil {
+		log.Fatal("Failed to bind cli argument:", err)
+	}
 }
 
 func initConfig() {
 	viper.SetConfigType("yaml")
-	viper.SetConfigName(AppName)
+	viper.SetConfigName(appName)
 
 	// all possible config file paths, by priority
-	viper.AddConfigPath("/etc/" + AppName + "/")
+	viper.AddConfigPath("/etc/" + appName + "/")
 	if home, err := homedir.Dir(); err == nil {
 		viper.AddConfigPath(home)
 	}

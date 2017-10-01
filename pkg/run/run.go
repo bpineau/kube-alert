@@ -8,12 +8,14 @@ import (
 	"github.com/bpineau/kube-alert/config"
 	"github.com/bpineau/kube-alert/pkg/controllers"
 	"github.com/bpineau/kube-alert/pkg/controllers/pod"
+	"github.com/bpineau/kube-alert/pkg/controllers/cs"
 	"github.com/bpineau/kube-alert/pkg/handlers"
 	"github.com/bpineau/kube-alert/pkg/health"
 )
 
 var Controllers = []controllers.Controller{
 	&pod.PodController{},
+	&cs.CsController{},
 }
 
 func Run(config *config.AlertConfig) {

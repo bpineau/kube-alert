@@ -1,8 +1,13 @@
 # kube-alert
 
-kube-alert watch for pod failures or anomalies, and send alerts accordingly.
+kube-alert watch for failures in Kubernetes clusters, and send alerts accordingly.
 
-Currently support alerting to Datadog and logs (ie. syslog).
+kube-alert monitors:
+* Pod failures (unschedulables, error pulling images, crashloop backoff, etc.)
+* Pods restarts
+* Cluster's components status (issues with etcd, scheduler, or controller-manager daemons)
+
+Support alerting to Datadog and to logs (ie. syslog).
 
 ## Build
 

@@ -3,6 +3,7 @@ package handlers
 import (
 	"github.com/bpineau/kube-alert/config"
 	"github.com/bpineau/kube-alert/pkg/handlers/pod"
+	"github.com/bpineau/kube-alert/pkg/handlers/cs"
 )
 
 type Handler interface {
@@ -13,4 +14,5 @@ type Handler interface {
 
 var Handlers = map[string]Handler{
 	"pod": &pod.PodHandler{},
+	"cs": &cs.CsHandler{},
 }

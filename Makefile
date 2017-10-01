@@ -6,10 +6,10 @@ tools:
 	which glide || go get -u github.com/Masterminds/glide
 
 lint:
-	gometalinter -j 1 --vendor --disable-all \
-		--enable=errcheck \
+	gometalinter --concurrency=1 --deadline=120s --vendor --disable-all \
 		--enable=vet \
 		--enable=vetshadow \
+		--enable=errcheck \
 		--enable=structcheck \
 		--enable=aligncheck \
 		--enable=deadcode \

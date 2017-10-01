@@ -6,6 +6,7 @@ kube-alert monitors:
 * Pod failures (unschedulables, error pulling images, crashloop backoff, etc.)
 * Pods restarts
 * Cluster's components status (issues with etcd, scheduler, or controller-manager daemons)
+* Nodes status (out-of-disk, memory pressure, network unavailable, ...)
 
 Support alerting to Datadog and to logs (ie. syslog).
 

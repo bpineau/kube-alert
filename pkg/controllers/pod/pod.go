@@ -22,12 +22,13 @@ func (c *PodController) HandlerName() string {
 }
 
 func (c *PodController) Init(conf *config.AlertConfig, handler handlers.Handler) controllers.Controller {
-	c.CommonController = controllers.CommonController{}
-	c.Conf = conf
-	c.Handler = handler
+	c.CommonController = controllers.CommonController{
+		Conf:    conf,
+		Handler: handler,
+		Name:    "pod",
+	}
 
 	client := c.Conf.ClientSet
-	c.Name = "pod"
 	c.ObjType = &v1.Pod{}
 	c.ListWatch = &cache.ListWatch{
 		ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {

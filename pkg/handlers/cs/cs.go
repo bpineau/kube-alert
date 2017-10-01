@@ -20,6 +20,10 @@ func (h *CsHandler) Init(c *config.AlertConfig) error {
 func (h *CsHandler) ObjectCreated(obj interface{}) (bool, string) {
 	cs, _ := obj.(*v1.ComponentStatus)
 
+	if cs == nil || cs.Conditions == nil {
+		return true, ""
+	}
+
 	for _, c := range cs.Conditions {
 		if c.Type != "Healthy" {
 			continue

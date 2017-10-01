@@ -6,13 +6,16 @@ import (
 	"syscall"
 
 	"github.com/bpineau/kube-alert/config"
-	"github.com/bpineau/kube-alert/pkg/controllers/pod"
-	pod_handler "github.com/bpineau/kube-alert/pkg/handlers/pod"
+	"github.com/bpineau/kube-alert/pkg/controllers"
+	"github.com/bpineau/kube-alert/pkg/handlers"
 	"github.com/bpineau/kube-alert/pkg/health"
 )
 
 func Run(config *config.AlertConfig) {
-	go pod.Start(config, new(pod_handler.PodHandler))
+	for _, controller := range controllers.Controllers {
+		go controller.Start(config, handlers.Handlers[controller.HandlerName()])
+	}
+
 	go health.HealthCheckServe(config)
 
 	sigterm := make(chan os.Signal, 1)

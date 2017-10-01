@@ -33,9 +33,16 @@ type PodController struct {
 	handler  handlers.Handler
 }
 
-func Start(conf *config.AlertConfig, handler handlers.Handler) {
-	handler.Init(conf)
-	c := newPodController(conf, handler)
+func (c *PodController) HandlerName() string {
+	return "pod"
+}
+
+func (c *PodController) Start(conf *config.AlertConfig, handler handlers.Handler) {
+	c.conf = conf
+	c.handler = handler
+	c.handler.Init(c.conf)
+
+	c.startInformer()
 	stopCh := make(chan struct{})
 	defer close(stopCh)
 
@@ -45,14 +52,13 @@ func Start(conf *config.AlertConfig, handler handlers.Handler) {
 	signal.Notify(sigterm, syscall.SIGTERM)
 	signal.Notify(sigterm, syscall.SIGINT)
 	<-sigterm
-
 }
 
-func newPodController(conf *config.AlertConfig, handler handlers.Handler) *PodController {
-	client := conf.ClientSet
-	queue := workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
+func (c *PodController) startInformer() {
+	client := c.conf.ClientSet
+	c.queue = workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
 
-	informer := cache.NewSharedIndexInformer(
+	c.informer = cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
 				return client.CoreV1().Pods(meta_v1.NamespaceAll).List(options)
@@ -66,33 +72,26 @@ func newPodController(conf *config.AlertConfig, handler handlers.Handler) *PodCo
 		cache.Indexers{},
 	)
 
-	informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+	c.informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(obj)
 			if err == nil {
-				queue.Add(key)
+				c.queue.Add(key)
 			}
 		},
 		UpdateFunc: func(old, new interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(new)
 			if err == nil {
-				queue.Add(key)
+				c.queue.Add(key)
 			}
 		},
 		DeleteFunc: func(obj interface{}) {
 			key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(obj)
 			if err == nil {
-				queue.Add(key)
+				c.queue.Add(key)
 			}
 		},
 	})
-
-	return &PodController{
-		conf:     conf,
-		informer: informer,
-		queue:    queue,
-		handler:  handler,
-	}
 }
 
 func (c *PodController) Run(stopCh <-chan struct{}) {

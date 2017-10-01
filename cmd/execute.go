@@ -48,7 +48,7 @@ var (
 	}
 )
 
-// Execute adds all child commands to the root command sets flags appropriately.
+// Execute adds all child commands to the root command and sets their flags.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		panic(err)

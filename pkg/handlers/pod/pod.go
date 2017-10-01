@@ -2,9 +2,10 @@ package pod
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/bpineau/kube-alert/config"
 	"k8s.io/client-go/pkg/api/v1"
-	"time"
 )
 
 var (

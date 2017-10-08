@@ -47,9 +47,14 @@ func New(logLevel string, logServer string, logOutput string) *logrus.Logger {
 		level = logrus.InfoLevel
 	}
 
+	formater := &logrus.TextFormatter{
+		FullTimestamp: true,
+		TimestampFormat: "2006-01-02 15:04:05",
+	}
+
 	log := &logrus.Logger{
 		Out:       output,
-		Formatter: new(logrus.TextFormatter), //new(logrus.JSONFormatter),
+		Formatter: formater,
 		Hooks:     make(logrus.LevelHooks),
 		Level:     level,
 	}

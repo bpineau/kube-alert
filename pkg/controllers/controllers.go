@@ -62,7 +62,7 @@ func (c *CommonController) Stop() {
 	c.Conf.Logger.Infof("Stopping %s controller", c.Name)
 	close(c.StopCh)
 
-	// give everything 2 seconds to stop gracefully
+	// give everything 2s max to stop gracefully
 	time.Sleep(2 * time.Second)
 	c.wg.Done()
 }

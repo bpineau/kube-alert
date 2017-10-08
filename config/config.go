@@ -16,6 +16,7 @@ type AlertConfig struct {
 	DdAppKey   string
 	DdApiKey   string
 	HealthPort int
+	MsgPrefix  string
 }
 
 func (c *AlertConfig) Init(apiserver string, kubeconfig string) {

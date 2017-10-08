@@ -18,13 +18,18 @@ var Notifiers = []Notifier{
 }
 
 func Notify(c *config.AlertConfig, title string, msg string) {
+	ptitle := title
+	if c.MsgPrefix != "" {
+		ptitle = fmt.Sprintf("%s %s", c.MsgPrefix, title)
+	}
+
 	if c.DryRun {
-		fmt.Printf("%s: %s\n", title, msg)
+		fmt.Printf("%s: %s\n", ptitle, msg)
 		return
 	}
 
 	for _, notifier := range Notifiers {
-		err := notifier.Notify(c, title, msg)
+		err := notifier.Notify(c, ptitle, msg)
 		if err != nil {
 			c.Logger.Warningf("Failed to notify: %s", err)
 		}

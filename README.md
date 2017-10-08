@@ -28,7 +28,7 @@ provide this server's address with "-s" flag, or a kube config with "-k").
 You can pass configuration values either by command line arguments, or
 environment variables, a yaml configuration file, or a combination or those.
 
-The command line flags are:
+The command line flags are (all optionals):
 ```
 Usage:
   kube-alert [flags]
@@ -45,6 +45,7 @@ Flags:
   -v, --log-level string         log level (default "debug")
   -l, --log-output string        log output (default "stderr")
   -r, --log-server string        log server (if using syslog)
+  -m, --messages-prefix string   prefix appended to notifications
 ```
 
 Using an (optional) configuration file:
@@ -52,6 +53,7 @@ Using an (optional) configuration file:
 dry-run: false
 healthcheck-port: 8080
 api-server: http://example.com:8080
+messages-prefix: kube-prod-cluster-42
 
 log:
   output: "stdout"

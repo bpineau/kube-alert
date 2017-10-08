@@ -28,6 +28,7 @@ var (
 	ddApiKey  string
 	ddAppKey  string
 	healthP   int
+	msgPrefix string
 
 	// rootCmd represents the base command when called without any subcommands
 	rootCmd = &cobra.Command{
@@ -42,6 +43,7 @@ var (
 				DdAppKey:   viper.GetString("datadog.app-key"),
 				DdApiKey:   viper.GetString("datadog.api-key"),
 				HealthPort: viper.GetInt("healthcheck-port"),
+				MsgPrefix:  viper.GetString("messages-prefix"),
 			}
 			config.Init(viper.GetString("api-server"), viper.GetString("kube-config"))
 			run.Run(config)
@@ -107,6 +109,11 @@ func init() {
 
 	rootCmd.PersistentFlags().IntVarP(&healthP, "healthcheck-port", "p", 0, "port for answering healthchecks")
 	if err := viper.BindPFlag("healthcheck-port", rootCmd.PersistentFlags().Lookup("healthcheck-port")); err != nil {
+		log.Fatal("Failed to bind cli argument:", err)
+	}
+
+	rootCmd.PersistentFlags().StringVarP(&msgPrefix, "messages-prefix", "m", "", "prefix appended to notifications")
+	if err := viper.BindPFlag("messages-prefix", rootCmd.PersistentFlags().Lookup("messages-prefix")); err != nil {
 		log.Fatal("Failed to bind cli argument:", err)
 	}
 }

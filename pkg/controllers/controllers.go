@@ -2,10 +2,8 @@ package controllers
 
 import (
 	"fmt"
-	"os"
-	"os/signal"
 	"strings"
-	"syscall"
+	"sync"
 	"time"
 
 	"github.com/bpineau/kube-alert/config"
@@ -25,7 +23,8 @@ var (
 )
 
 type Controller interface {
-	Start()
+	Start(wg *sync.WaitGroup)
+	Stop()
 	Init(c *config.AlertConfig, handler handlers.Handler) Controller
 	HandlerName() string
 }
@@ -38,23 +37,34 @@ type CommonController struct {
 	Name      string
 	ListWatch cache.ListerWatcher
 	ObjType   runtime.Object
+	StopCh    chan struct{}
+	wg        *sync.WaitGroup
 }
 
-func (c *CommonController) Start() {
+func (c *CommonController) Start(wg *sync.WaitGroup) {
+	c.Conf.Logger.Infof("Starting %s controller", c.Name)
+
 	if err := c.Handler.Init(c.Conf); err != nil {
 		c.Conf.Logger.Fatalf("Failed to init %s handler: %s", c.Name, err)
 	}
 
+	c.StopCh = make(chan struct{})
+	c.wg = wg
+
 	c.startInformer()
-	stopCh := make(chan struct{})
-	defer close(stopCh)
 
-	go c.Run(stopCh)
+	go c.Run(c.StopCh)
 
-	sigterm := make(chan os.Signal, 1)
-	signal.Notify(sigterm, syscall.SIGTERM)
-	signal.Notify(sigterm, syscall.SIGINT)
-	<-sigterm
+	<-c.StopCh
+}
+
+func (c *CommonController) Stop() {
+	c.Conf.Logger.Infof("Stopping %s controller", c.Name)
+	close(c.StopCh)
+
+	// give everything 2 seconds to stop gracefully
+	time.Sleep(2 * time.Second)
+	c.wg.Done()
 }
 
 func (c *CommonController) startInformer() {
@@ -92,8 +102,6 @@ func (c *CommonController) startInformer() {
 func (c *CommonController) Run(stopCh <-chan struct{}) {
 	defer utilruntime.HandleCrash()
 	defer c.Queue.ShutDown()
-
-	c.Conf.Logger.Infof("Starting %s controller", c.Name)
 
 	go c.Informer.Run(stopCh)
 

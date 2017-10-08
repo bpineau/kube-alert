@@ -3,6 +3,7 @@ package run
 import (
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 
 	"github.com/bpineau/kube-alert/config"
@@ -21,8 +22,15 @@ var Controllers = []controllers.Controller{
 }
 
 func Run(config *config.AlertConfig) {
+	wg := sync.WaitGroup{}
+	wg.Add(len(Controllers))
+	defer wg.Wait()
+
 	for _, c := range Controllers {
-		go c.Init(config, handlers.Handlers[c.HandlerName()]).Start()
+		go c.Init(config, handlers.Handlers[c.HandlerName()]).Start(&wg)
+		defer func(c controllers.Controller) {
+			go c.Stop()
+		}(c)
 	}
 
 	go health.HealthCheckServe(config)
@@ -31,4 +39,6 @@ func Run(config *config.AlertConfig) {
 	signal.Notify(sigterm, syscall.SIGTERM)
 	signal.Notify(sigterm, syscall.SIGINT)
 	<-sigterm
+
+	config.Logger.Infof("Stopping all controllers")
 }

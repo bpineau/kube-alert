@@ -48,7 +48,7 @@ func New(logLevel string, logServer string, logOutput string) *logrus.Logger {
 	}
 
 	formater := &logrus.TextFormatter{
-		FullTimestamp: true,
+		FullTimestamp:   true,
 		TimestampFormat: "2006-01-02 15:04:05",
 	}
 

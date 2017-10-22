@@ -10,6 +10,7 @@ import (
 	ls "github.com/sirupsen/logrus/hooks/syslog"
 )
 
+// New initialize logrus and return a new logger
 func New(logLevel string, logServer string, logOutput string) *logrus.Logger {
 	var level logrus.Level
 	var output io.Writer

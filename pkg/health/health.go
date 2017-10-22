@@ -14,7 +14,8 @@ func healthCheckReply(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func HealthCheckServe(c *config.AlertConfig) {
+// HeartBeatService exposes an http healthcheck handler
+func HeartBeatService(c *config.AlertConfig) {
 	if c.HealthPort == 0 {
 		return
 	}

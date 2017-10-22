@@ -5,9 +5,11 @@ import (
 	"path/filepath"
 
 	"k8s.io/client-go/kubernetes"
-	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+
+	// Ensure we have GCP auth method linked in
+	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 )
 
 func buildConfig(apiserver string, kubeconfig string) (*rest.Config, error) {
@@ -24,6 +26,8 @@ func buildConfig(apiserver string, kubeconfig string) (*rest.Config, error) {
 	return rest.InClusterConfig()
 }
 
+// NewClientSet create a clientset for the optional apiserver or kubeconfig configs,
+// defaulting to the automatic, in cluster settings.
 func NewClientSet(apiserver string, kubeconfig string) (*kubernetes.Clientset, error) {
 	config, err := buildConfig(apiserver, kubeconfig)
 	if err != nil {

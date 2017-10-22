@@ -12,16 +12,19 @@ import (
 	"k8s.io/client-go/tools/cache"
 )
 
-type CsController struct {
+// Controller monitors componentstatus
+type Controller struct {
 	// https://golang.org/doc/effective_go.html#embedding
 	controllers.CommonController
 }
 
-func (c *CsController) HandlerName() string {
+// HandlerName return the name of this controller's corresponding handler
+func (c *Controller) HandlerName() string {
 	return "cs"
 }
 
-func (c *CsController) Init(conf *config.AlertConfig, handler handlers.Handler) controllers.Controller {
+// Init initialize componentstatus controller
+func (c *Controller) Init(conf *config.AlertConfig, handler handlers.Handler) controllers.Controller {
 	c.CommonController = controllers.CommonController{
 		Conf:    conf,
 		Handler: handler,

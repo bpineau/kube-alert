@@ -15,25 +15,26 @@ import (
 	"github.com/bpineau/kube-alert/pkg/health"
 )
 
-var Controllers = []controllers.Controller{
-	&cs.CsController{},
-	&pod.PodController{},
-	&node.NodeController{},
+var conts = []controllers.Controller{
+	&cs.Controller{},
+	&pod.Controller{},
+	&node.Controller{},
 }
 
+// Run launchs the effective controllers goroutines
 func Run(config *config.AlertConfig) {
 	wg := sync.WaitGroup{}
-	wg.Add(len(Controllers))
+	wg.Add(len(conts))
 	defer wg.Wait()
 
-	for _, c := range Controllers {
+	for _, c := range conts {
 		go c.Init(config, handlers.Handlers[c.HandlerName()]).Start(&wg)
 		defer func(c controllers.Controller) {
 			go c.Stop()
 		}(c)
 	}
 
-	go health.HealthCheckServe(config)
+	go health.HeartBeatService(config)
 
 	sigterm := make(chan os.Signal, 1)
 	signal.Notify(sigterm, syscall.SIGTERM)

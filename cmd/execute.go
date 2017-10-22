@@ -25,7 +25,7 @@ var (
 	logLevel  string
 	logOutput string
 	logServer string
-	ddApiKey  string
+	ddAPIKey  string
 	ddAppKey  string
 	healthP   int
 	msgPrefix string
@@ -41,7 +41,7 @@ var (
 				DryRun:     viper.GetBool("dry-run"),
 				Logger:     klog.New(viper.GetString("log.level"), viper.GetString("log.server"), viper.GetString("log.output")),
 				DdAppKey:   viper.GetString("datadog.app-key"),
-				DdApiKey:   viper.GetString("datadog.api-key"),
+				DdAPIKey:   viper.GetString("datadog.api-key"),
 				HealthPort: viper.GetInt("healthcheck-port"),
 				MsgPrefix:  viper.GetString("messages-prefix"),
 			}
@@ -102,7 +102,7 @@ func init() {
 		log.Fatal("Failed to bind cli argument:", err)
 	}
 
-	rootCmd.PersistentFlags().StringVarP(&ddApiKey, "datadog-api-key", "i", "", "datadog api key")
+	rootCmd.PersistentFlags().StringVarP(&ddAPIKey, "datadog-api-key", "i", "", "datadog api key")
 	if err := viper.BindPFlag("datadog.api-key", rootCmd.PersistentFlags().Lookup("datadog-api-key")); err != nil {
 		log.Fatal("Failed to bind cli argument:", err)
 	}
@@ -136,7 +136,7 @@ func initConfig() {
 
 	// allow config params through prefixed env variables
 	viper.SetEnvPrefix("KUBE_ALERT")
-	replacer := strings.NewReplacer("-", "_")
+	replacer := strings.NewReplacer("-", "_", ".", "_DOT_")
 	viper.SetEnvKeyReplacer(replacer)
 	viper.AutomaticEnv()
 

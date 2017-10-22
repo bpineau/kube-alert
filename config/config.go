@@ -9,16 +9,18 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
+// AlertConfig is the main program configuration, passed to controllers Init()
 type AlertConfig struct {
 	DryRun     bool
 	Logger     *logrus.Logger
 	ClientSet  *kubernetes.Clientset
 	DdAppKey   string
-	DdApiKey   string
+	DdAPIKey   string
 	HealthPort int
 	MsgPrefix  string
 }
 
+// Init initialize the configuration (creating the ClientSet for the cluster)
 func (c *AlertConfig) Init(apiserver string, kubeconfig string) {
 	var err error
 

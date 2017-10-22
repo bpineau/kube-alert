@@ -7,7 +7,8 @@ import (
 	"k8s.io/client-go/pkg/api/v1"
 )
 
-type NodeHandler struct {
+// Handler implements handlers.Handler
+type Handler struct {
 	conf *config.AlertConfig
 }
 
@@ -18,13 +19,15 @@ var knownBadConditions = map[string]bool{
 	"NetworkUnavailable": true,
 }
 
-func (n *NodeHandler) Init(c *config.AlertConfig) error {
+// Init initialize a new node handler
+func (n *Handler) Init(c *config.AlertConfig) error {
 	c.Logger.Info("node handler initialized")
 	n.conf = c
 	return nil
 }
 
-func (n *NodeHandler) ObjectCreated(obj interface{}) (bool, string) {
+// ObjectCreated inspect a node health
+func (n *Handler) ObjectCreated(obj interface{}) (bool, string) {
 	node, _ := obj.(*v1.Node)
 
 	for _, c := range node.Status.Conditions {
@@ -40,6 +43,7 @@ func (n *NodeHandler) ObjectCreated(obj interface{}) (bool, string) {
 	return true, ""
 }
 
-func (n *NodeHandler) ObjectDeleted(obj interface{}) (bool, string) {
+// ObjectDeleted is notified on node deletion
+func (n *Handler) ObjectDeleted(obj interface{}) (bool, string) {
 	return true, ""
 }

@@ -18,10 +18,14 @@ import (
 )
 
 var (
-	resyncInterval  time.Duration = 300 * time.Second
-	maxProcessRetry int           = 6
+	resyncInterval  = 300 * time.Second
+	maxProcessRetry = 6
 )
 
+// Controller are started in a persistent goroutine a program launch,
+// and are responsible for watching resources and calling a dedicated
+// handlers when a significant event occurs. Most controllers could just
+// embed CommonController, then only have to implement a dedicated Init().
 type Controller interface {
 	Start(wg *sync.WaitGroup)
 	Stop()
@@ -29,6 +33,16 @@ type Controller interface {
 	HandlerName() string
 }
 
+// CommonController groups fields and funcs that most controllers would like
+// to implement (at least, controllers in the Kubernetes' client-go sense),
+// maybe by embedding (https://golang.org/doc/effective_go.html#embedding).
+// For example with:
+//  import "github.com/bpineau/kube-alert/pkg/controllers"
+//  type MyThing struct {
+//      controllers.CommonController
+//  }
+// You would benefit for the common "Controller" interface implementation,
+// except for Init() that you need to implement.
 type CommonController struct {
 	Conf      *config.AlertConfig
 	Queue     workqueue.RateLimitingInterface
@@ -41,6 +55,7 @@ type CommonController struct {
 	wg        *sync.WaitGroup
 }
 
+// Start initialize and launch a controller goroutine.
 func (c *CommonController) Start(wg *sync.WaitGroup) {
 	c.Conf.Logger.Infof("Starting %s controller", c.Name)
 
@@ -53,11 +68,12 @@ func (c *CommonController) Start(wg *sync.WaitGroup) {
 
 	c.startInformer()
 
-	go c.Run(c.StopCh)
+	go c.run(c.StopCh)
 
 	<-c.StopCh
 }
 
+// Stop ends a controller and notify the controllers WaitGroup
 func (c *CommonController) Stop() {
 	c.Conf.Logger.Infof("Stopping %s controller", c.Name)
 	close(c.StopCh)
@@ -99,7 +115,7 @@ func (c *CommonController) startInformer() {
 	})
 }
 
-func (c *CommonController) Run(stopCh <-chan struct{}) {
+func (c *CommonController) run(stopCh <-chan struct{}) {
 	defer utilruntime.HandleCrash()
 	defer c.Queue.ShutDown()
 

@@ -7,17 +7,20 @@ import (
 	"k8s.io/client-go/pkg/api/v1"
 )
 
-type CsHandler struct {
+// Handler implements handlers.Handler
+type Handler struct {
 	conf *config.AlertConfig
 }
 
-func (h *CsHandler) Init(c *config.AlertConfig) error {
+// Init initialize a new cs handler
+func (h *Handler) Init(c *config.AlertConfig) error {
 	c.Logger.Info("componentstatus handler initialized")
 	h.conf = c
 	return nil
 }
 
-func (h *CsHandler) ObjectCreated(obj interface{}) (bool, string) {
+// ObjectCreated inspect a cs health
+func (h *Handler) ObjectCreated(obj interface{}) (bool, string) {
 	cs, _ := obj.(*v1.ComponentStatus)
 
 	if cs == nil || cs.Conditions == nil {
@@ -36,6 +39,7 @@ func (h *CsHandler) ObjectCreated(obj interface{}) (bool, string) {
 	return true, ""
 }
 
-func (h *CsHandler) ObjectDeleted(obj interface{}) (bool, string) {
+// ObjectDeleted is notified on cs deletion (won't happen often;)
+func (h *Handler) ObjectDeleted(obj interface{}) (bool, string) {
 	return true, ""
 }

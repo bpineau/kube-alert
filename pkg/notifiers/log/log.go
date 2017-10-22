@@ -4,10 +4,12 @@ import (
 	"github.com/bpineau/kube-alert/config"
 )
 
-type LogNotifier struct {
+// Notifier implements notifiers.Notifier
+type Notifier struct {
 }
 
-func (l *LogNotifier) Notify(c *config.AlertConfig, title string, msg string) error {
+// Notify sends notification to the configured logrus logger
+func (l *Notifier) Notify(c *config.AlertConfig, title string, msg string) error {
 	c.Logger.Infof("%s: %s", title, msg)
 	return nil
 }

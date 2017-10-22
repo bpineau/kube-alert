@@ -5,7 +5,8 @@ import (
 	"github.com/zorkian/go-datadog-api"
 )
 
-type DdNotifier struct {
+// Notifier implements notifers.Notifier for Datadog
+type Notifier struct {
 }
 
 var tags = []string{
@@ -13,13 +14,14 @@ var tags = []string{
 	"origin:kube-alert",
 }
 
-func (l *DdNotifier) Notify(c *config.AlertConfig, title string, msg string) error {
-	if c.DdApiKey == "" {
+// Notify sends alerts as Datadog events
+func (l *Notifier) Notify(c *config.AlertConfig, title string, msg string) error {
+	if c.DdAPIKey == "" {
 		c.Logger.Debug("Omitting datadog notification, api key missing")
 		return nil
 	}
 
-	client := datadog.NewClient(c.DdApiKey, c.DdAppKey)
+	client := datadog.NewClient(c.DdAPIKey, c.DdAppKey)
 
 	_, err := client.PostEvent(&datadog.Event{
 		Title:     &title,

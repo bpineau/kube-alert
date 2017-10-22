@@ -6,7 +6,8 @@ tools:
 	which glide || go get -u github.com/Masterminds/glide
 
 lint:
-	gometalinter --concurrency=1 --deadline=120s --vendor --disable-all \
+	gometalinter --concurrency=1 --deadline=300s --vendor --disable-all \
+		--enable=golint \
 		--enable=vet \
 		--enable=vetshadow \
 		--enable=errcheck \

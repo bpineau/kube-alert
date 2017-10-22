@@ -12,17 +12,20 @@ var (
 	minAgeMinutes time.Duration = 15
 )
 
-type PodHandler struct {
+// Handler implements handlers.Handler
+type Handler struct {
 	conf *config.AlertConfig
 }
 
-func (h *PodHandler) Init(c *config.AlertConfig) error {
+// Init initialize a new pod handler
+func (h *Handler) Init(c *config.AlertConfig) error {
 	c.Logger.Info("pod handler initialized")
 	h.conf = c
 	return nil
 }
 
-func (h *PodHandler) ObjectCreated(obj interface{}) (bool, string) {
+// ObjectCreated inspect a pod health
+func (h *Handler) ObjectCreated(obj interface{}) (bool, string) {
 	pod, _ := obj.(*v1.Pod)
 
 	// ignore recent pods
@@ -41,11 +44,12 @@ func (h *PodHandler) ObjectCreated(obj interface{}) (bool, string) {
 	return true, ""
 }
 
-func (h *PodHandler) ObjectDeleted(obj interface{}) (bool, string) {
+// ObjectDeleted is notified on pod deletion
+func (h *Handler) ObjectDeleted(obj interface{}) (bool, string) {
 	return true, ""
 }
 
-func (h *PodHandler) checkPodHealthy(pod *v1.Pod) (bool, string) {
+func (h *Handler) checkPodHealthy(pod *v1.Pod) (bool, string) {
 
 	if pod.Status.Phase == "Failed" {
 		return false, "pod in Failed state: " + extractContainersErrors(pod)
